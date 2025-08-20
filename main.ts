@@ -1,8 +1,3 @@
-let L1_IR = 0
-let R1_IR = 0
-let 差 = 0
-let L_IR = 0
-let R_IR = 0
 function 右輪 (速度: number) {
     if (速度 < 0) {
         if (速度 <= -255) {
@@ -38,27 +33,41 @@ function 左輪 (速度: number) {
     }
 }
 function 白線上感測器 () {
-    L1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L1)
-    R1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R1)
-    if (L1_IR < 3000 && R1_IR > 3000) {
-        差 = 3000 - L1_IR
-        左輪(1)
-        右輪(1)
-    } else if (L1_IR > 3000 && R1_IR < 3000) {
-        差 = 3000 - R1_IR
-    } else if (L1_IR < 3000 && R1_IR < 3000) {
-    	
-    } else {
-    	
+    while (停停停 == 0) {
+        L1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L1)
+        R1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R1)
+        if (L1_IR < 3200 && R1_IR > 2900) {
+            差 = (3200 - L1_IR) / 25
+            越多 = 計次越多次沒修回來越多 / 1000
+            修 = 差 + 越多
+            雙輪左速度右速度(速度 + 修, 速度 - 修)
+            計次越多次沒修回來越多 += 1
+        } else if (L1_IR > 2900 && R1_IR < 3200) {
+            差 = (3200 - R1_IR) / 25
+            越多 = 計次越多次沒修回來越多 / 1000
+            修 = 差 + 越多
+            雙輪左速度右速度(速度 - 修, 速度 + 修)
+            計次越多次沒修回來越多 += 1
+        } else if (L1_IR < 3200 && R1_IR < 3200) {
+            雙輪左速度右速度(0, 0)
+        } else {
+            計次越多次沒修回來越多 = 0
+            雙輪左速度右速度(速度, 速度)
+        }
+        全部停的條件()
     }
 }
 input.onButtonPressed(Button.A, function () {
-    左輪(255)
-    右輪(255)
-    basic.pause(1000)
-    左輪(0)
-    右輪(0)
+    停停停 = 0
+    白線上感測器()
 })
+function 全部停的條件 () {
+    if (DFRobotMaqueenPlus.readPatrol(Patrol.L1) == 0 && DFRobotMaqueenPlus.readPatrol(Patrol.L2) == 0 && DFRobotMaqueenPlus.readPatrol(Patrol.L3) == 0 && (DFRobotMaqueenPlus.readPatrol(Patrol.R1) == 0 && DFRobotMaqueenPlus.readPatrol(Patrol.R2) == 0 && DFRobotMaqueenPlus.readPatrol(Patrol.R3) == 0)) {
+        停停停 = 1
+        左輪(0)
+        右輪(0)
+    }
+}
 function 白線兩邊感測器 () {
     L_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L2)
     if (L_IR <= 1300) {
@@ -72,8 +81,6 @@ function 白線兩邊感測器 () {
     } else {
         R_IR = Math.round((DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R2) - 1200) / 25)
     }
-    serial.writeValue("R", R_IR)
-    serial.writeValue("L", L_IR)
 }
 function 雙輪左速度右速度 (左速度: number, 右速度: number) {
     if (左速度 < 0) {
@@ -107,6 +114,22 @@ function 雙輪左速度右速度 (左速度: number, 右速度: number) {
         DFRobotMaqueenPlus.mototStop(Motors.M2)
     }
 }
+let R_IR = 0
+let L_IR = 0
+let 修 = 0
+let 越多 = 0
+let R1_IR = 0
+let L1_IR = 0
+let 停停停 = 0
+let 計次越多次沒修回來越多 = 0
+let 差 = 0
+let 速度 = 0
+速度 = 120
+差 = 0
+計次越多次沒修回來越多 = 0
+let L緩 = 0
+let L前緩 = 0
 basic.forever(function () {
-	
+    serial.writeValue("R", DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R2))
+    serial.writeValue("L", DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L2))
 })
