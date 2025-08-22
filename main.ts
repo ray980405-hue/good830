@@ -34,22 +34,43 @@ function 左輪 (速度: number) {
 }
 function 白線上感測器 () {
     while (停停停 == 0) {
+        L_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L2)
+        R_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R2)
         L1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L1)
         R1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R1)
-        if (L1_IR < 3200 && R1_IR > 2900) {
-            差 = (3200 - L1_IR) / 25
-            越多 = 計次越多次沒修回來越多 / 1000
-            修 = 差 + 越多
-            雙輪左速度右速度(速度 + 修, 速度 - 修)
-            計次越多次沒修回來越多 += 1
-        } else if (L1_IR > 2900 && R1_IR < 3200) {
-            差 = (3200 - R1_IR) / 25
-            越多 = 計次越多次沒修回來越多 / 1000
-            修 = 差 + 越多
-            雙輪左速度右速度(速度 - 修, 速度 + 修)
-            計次越多次沒修回來越多 += 1
-        } else if (L1_IR < 3200 && R1_IR < 3200) {
-            雙輪左速度右速度(0, 0)
+        if (L_IR < 1500 && R_IR < 1500) {
+            if (L1_IR < 3200 && R1_IR > 2900) {
+                差 = (3200 - L1_IR) / 15
+                越多 = 計次越多次沒修回來越多 / 1000
+                修 = 差 + 越多
+                雙輪左速度右速度(速度 + 修, 速度 - 修)
+                計次越多次沒修回來越多 += 1
+            } else if (L1_IR > 2900 && R1_IR < 3200) {
+                差 = (3200 - R1_IR) / 15
+                越多 = 計次越多次沒修回來越多 / 1000
+                修 = 差 + 越多
+                雙輪左速度右速度(速度 - 修, 速度 + 修)
+                計次越多次沒修回來越多 += 1
+            } else {
+                計次越多次沒修回來越多 = 0
+                雙輪左速度右速度(速度, 速度)
+            }
+        } else if (L_IR > 1500 && R_IR < 1500) {
+            while (R1_IR < 2000) {
+                L_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L2)
+                R_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R2)
+                L1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L1)
+                R1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R1)
+                雙輪左速度右速度(0, 速度)
+            }
+        } else if (R_IR > 1500 && L_IR < 1500) {
+            while (L1_IR < 2000) {
+                L_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L2)
+                R_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R2)
+                L1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.L1)
+                R1_IR = DFRobotMaqueenPlus.readPatrolVoltage(Patrol.R1)
+                雙輪左速度右速度(速度, 0)
+            }
         } else {
             計次越多次沒修回來越多 = 0
             雙輪左速度右速度(速度, 速度)
@@ -114,12 +135,12 @@ function 雙輪左速度右速度 (左速度: number, 右速度: number) {
         DFRobotMaqueenPlus.mototStop(Motors.M2)
     }
 }
-let R_IR = 0
-let L_IR = 0
 let 修 = 0
 let 越多 = 0
 let R1_IR = 0
 let L1_IR = 0
+let R_IR = 0
+let L_IR = 0
 let 停停停 = 0
 let 計次越多次沒修回來越多 = 0
 let 差 = 0
